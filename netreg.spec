@@ -1,7 +1,7 @@
 Summary: An automated DHCP Registration System
 Name: netreg
 Version: 1.5.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://netreg.org/
@@ -60,8 +60,6 @@ they can gain full network access.
 %{__ln_s} %{_sysconfdir}/netreg/Variables.pm %{buildroot}%{_libdir}/perl5/vendor_perl/Net/NetReg/Variables.pm
 
 %{__mkdir_p} %{buildroot}%{_var}/lib/netreg
-touch %{buildroot}%{_var}/lib/netreg/netreg.registered
-touch %{buildroot}%{_var}/lib/netreg/netreg.registered.new
 
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/httpd/conf.d
 %{__cat} >%{buildroot}%{_sysconfdir}/httpd/conf.d/netreg.conf <<EOF
@@ -71,11 +69,11 @@ RewriteCond %{REQUEST_URI} !^/registration.html
 RewriteCond %{REQUEST_URI} !^/cgi-bin
 RewriteCond %{REQUEST_URI} !^/netreg-gfx
 RewriteRule ^(.*)$ /registration.html [R=302,L]
-<Directory "/var/www/html">
+<Location />
     Order deny,allow
     Deny from all
     Allow from 10.110 192.168.100 127.0.0.1
-</Directory>
+</Location>
 <Directory "/var/www/cgi-bin">
     AllowOverride AuthConfig
     Options None
@@ -102,14 +100,26 @@ EOF
 %{_bindir}/*
 %config(noreplace) %{_sysconfdir}/netreg
 %dir %{_var}/lib/netreg
-%{_var}/lib/netreg/netreg.registered
-%attr(0664,apache,apache) %{_var}/lib/netreg/netreg.registered.new
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/netreg.conf
 %config(noreplace) %{_sysconfdir}/cron.d/netreg-refresh-dhcpdconf
 
 
+%post
+if [ ! -e %{_var}/lib/netreg/netreg.registered ]; then
+   touch %{_var}/lib/netreg/netreg.registered
+fi
+if [ ! -e %{_var}/lib/netreg/netreg.registered.new ]; then
+   touch %{_var}/lib/netreg/netreg.registered.new
+   chown apache.apache %{_var}/lib/netreg/netreg.registered.new
+fi
+
+
 %changelog
-* Tue Mar 26 2013 Phil Gold <phil@camaro.cs.jhu.edu> - 1.5.1-3
+* Tue Mar 26 2013 Phil Gold <phil@cs.jhu.edu> - 1.5.1-4
+- Create DHCP file in postinstallation script.
+- Change Apache permissions to work.
+
+* Tue Mar 26 2013 Phil Gold <phil@cs.jhu.edu> - 1.5.1-3
 - Add email field patch.
 
 * Tue Mar 26 2013 Phil Gold <phil@cs.jhu.edu> - 1.5.1-2
