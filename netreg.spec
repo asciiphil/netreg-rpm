@@ -1,7 +1,7 @@
 Summary: An automated DHCP Registration System
 Name: netreg
 Version: 1.5.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://netreg.org/
@@ -58,12 +58,16 @@ they can gain full network access.
 %{__ln_s} %{_sysconfdir}/netreg/Variables.pm %{buildroot}%{_libdir}/perl5/vendor_perl/Net/NetReg/Variables.pm
 
 %{__mkdir_p} %{buildroot}%{_var}/lib/netreg
+touch %{buildroot}%{_var}/lib/netreg/netreg.registered
+touch %{buildroot}%{_var}/lib/netreg/netreg.registered.new
 
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/httpd/conf.d
 %{__cat} >%{buildroot}%{_sysconfdir}/httpd/conf.d/netreg.conf <<EOF
 Options +FollowSymlinks
 RewriteEngine on
 RewriteCond %{REQUEST_URI} !^/registration.html
+RewriteCond %{REQUEST_URI} !^/cgi-bin
+RewriteCond %{REQUEST_URI} !^/netreg-gfx
 RewriteRule ^(.*)$ /registration.html [R=302,L]
 <Directory "/var/www/html">
     Order deny,allow
@@ -95,12 +99,18 @@ EOF
 %{_libdir}/perl5/vendor_perl/Net/NetReg
 %{_bindir}/*
 %config(noreplace) %{_sysconfdir}/netreg
-%attr(0664,apache,apache) %{_var}/lib/netreg
+%dir %{_var}/lib/netreg
+%{_var}/lib/netreg/netreg.registered
+%attr(0664,apache,apache) %{_var}/lib/netreg/netreg.registered.new
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/netreg.conf
 %config(noreplace) %{_sysconfdir}/cron.d/netreg-refresh-dhcpdconf
 
 
 %changelog
-* Fri Mar 22 2013 Phil Gold <phil@camaro.cs.jhu.edu> - 
+* Tue Mar 26 2013 Phil Gold <phil@cs.jhu.edu> - 1.5.1-2
+- Fix apache redirect.
+- Create netreg.registered files.
+
+* Fri Mar 22 2013 Phil Gold <phil@cs.jhu.edu> - 
 - Initial build.
 

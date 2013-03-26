@@ -32,8 +32,8 @@ diff -Naur netreg-1.5.1/usr/lib/perl5/site_perl/Net/NetReg/Variables.pm netreg-l
    $myLOGO = "your_logo.gif";
 diff -Naur netreg-1.5.1/usr/local/bin/refresh-dhcpdconf netreg-local/usr/local/bin/refresh-dhcpdconf
 --- netreg-1.5.1/usr/local/bin/refresh-dhcpdconf	2005-05-20 07:12:30.000000000 -0400
-+++ netreg-local/usr/local/bin/refresh-dhcpdconf	2013-03-25 13:49:01.000000000 -0400
-@@ -1,14 +1,14 @@
++++ netreg-local/usr/local/bin/refresh-dhcpdconf	2013-03-26 12:10:23.000000000 -0400
+@@ -1,47 +1,21 @@
  #!/bin/sh
  
  # refresh-dhcpdconf for Netreg
@@ -50,9 +50,10 @@ diff -Naur netreg-1.5.1/usr/local/bin/refresh-dhcpdconf netreg-local/usr/local/b
 -  cp /usr/local/etc/netreg/dhcpd/netreg.registered.new /usr/local/etc/netreg/dhcpd/netreg.registered
 +  cp /var/lib/netreg/netreg.registered.new /var/lib/netreg/netreg.registered
    echo "Testing new config..."
-   /usr/sbin/dhcpd -t -cf /etc/dhcpd.conf
+-  /usr/sbin/dhcpd -t -cf /etc/dhcpd.conf
++  /usr/sbin/dhcpd -t
    if [ "$?" -ne 0 ]; then
-@@ -16,32 +16,6 @@
+      echo "Error in dhcp configuration... leaving existing server running!"
       exit 1
    fi
    echo "Reloading the server..."
