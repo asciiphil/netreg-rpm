@@ -1,0 +1,90 @@
+diff -Naur netreg-1.5.1/README.RedHat netreg-readme/README.RedHat
+--- netreg-1.5.1/README.RedHat	1969-12-31 19:00:00.000000000 -0500
++++ netreg-readme/README.RedHat	2013-03-26 10:01:09.000000000 -0400
+@@ -0,0 +1,86 @@
++NetReg for RHEL
++===============
++
++Potential Pitfalls
++------------------
++
++Nessus integration has not been tested with this RPM.
++
++
++Setting up NetReg
++-----------------
++
++After installing the RPM, you'll need to do some customization to fit
++NetReg to your site.
++
++### Configure Authentication
++
++Edit `Variables.pm` in `/etc/netreg`.
++
++ * To forgo authentication, set `$AUTH_METHOD` to `"NULL"`.
++ 
++ * To authenticate against a POP3 server, set `$AUTH_METHOD` to `"POP"`
++   and set `$POPSERVER` to the hostname or IP address of your POP server.
++   
++ * To authenticate against an FTP server, set `$AUTH_METHOD` to `"FTP"`
++   and set `$FTPSERVER` to the hostname or IP address of your FTP server.
++   
++ * To authenticate against an IMAP server, set `$AUTH_METHOD` to `"IMAP"`
++   and set `$IMAPSERVER` to the hostname or IP address of your IMAP
++   server.
++ 
++ * To authenticate against a RADIUS server, set `$AUTH_METHOD` to
++   `"RADIUS"` and set `@RADIUS_SVRS` to a list of your RADIUS servers' IP
++   addresses, e.g. `@RADIUS_SVRS = ("10.0.2.1", "10.0.2.2");`.
++   
++ * To authenticate against an LDAP server, set `$AUTH_METHOD` to `"LDAP"`,
++   set `@LDAP_SERVERS` to an array of your LDAP servers' IP addresses, and
++   fill out the rest of the LDAP section of `Variables.pm`.
++
++### Configure subnets
++
++Edit `subnet.dat` in `/etc/netreg` and put in subnets appropriate to your
++network.
++
++### Configure Apache subnet restrictions
++
++Edit `netreg.conf` in `/etc/httpd/conf.d` and put the subnets for your
++unauthenticated users in the `allow from` line.
++
++### Create an Apache authentication file
++
++The Apache auth file should be located at `/etc/netreg/htusers`.  Without
++it, no administration can be done through the administrative web
++interface.  To add a "netreg" administrative account, run the following
++command:
++
++    htpasswd -c /etc/netreg/htusers netreg
++
++### Modify the registration page (optional)
++
++The registration page is at `/var/www/html/registration.html`; you'll
++probably want to customize it to your site.
++
++### Configure DHCPd
++
++Modify your DHCP server's config file (`/etc/dhcp/dhcpd.conf` by
++default).  Add definitions for your subnets and place the following line
++at the end:
++
++    include "/var/lib/netreg/netreg.registered";
++
++The documentation directory contains an example dhcpd.conf file.
++
++### Configure Bind
++
++Edit `netreg.zone` and `zones.conf` in `/etc/netreg` and change the
++default host IP address (192.168.100.10) to your host's IP address.
++
++### Enable Apache, DHCPd, and Bind
++
++    chkconfig named on
++    service named start
++    chkconfig httpd on
++    service httpd start
++    chkconfig dhcpd on
++    service dhcpd start

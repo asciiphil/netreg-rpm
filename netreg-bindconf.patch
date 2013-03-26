@@ -1,0 +1,235 @@
+diff -Naur netreg-1.5.1/var/named/chroot/etc/named.conf netreg-bindconf/var/named/chroot/etc/named.conf
+--- netreg-1.5.1/var/named/chroot/etc/named.conf	2005-06-16 21:08:04.000000000 -0400
++++ netreg-bindconf/var/named/chroot/etc/named.conf	2013-03-25 13:30:53.000000000 -0400
+@@ -19,49 +19,6 @@
+         inet 127.0.0.1 allow { localhost; } keys { rndckey; };
+ };
+ 
+-zone "microsoft.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "akadns.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "akadns.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "akamai.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "akamai.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "download.windowsupdate.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "msft.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "msft.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "nsatc.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "nsatc.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "ntservicepack.microsoft.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "windows.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "windows.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "windowsupdate.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "windowsupdate.microsoft.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "windowsupdate.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "wustat.windows.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "footprint.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "edgesuite.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "speedera.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "speedera.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-
+-## Allowed Apple Zones
+-
+-zone "apple.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-
+-## Allowed Antivirus Zones
+-
+-zone "sophos.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "mcafee.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "symantec.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-
+-## Allowed Misc Zones
+-
+-zone "dell.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "dell4me.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-zone "powerpcs.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
+-
+-## Wilcard zone
+-
+-zone "." {
+-        type master;
+-        file "named.ca";
+-};
++include "/etc/netreg/zones.conf";
+ 
+ include "/etc/rndc.key";
+diff -Naur netreg-1.5.1/var/named/chroot/etc/netreg.zone netreg-bindconf/var/named/chroot/etc/netreg.zone
+--- netreg-1.5.1/var/named/chroot/etc/netreg.zone	1969-12-31 19:00:00.000000000 -0500
++++ netreg-bindconf/var/named/chroot/etc/netreg.zone	2013-03-26 09:55:37.000000000 -0400
+@@ -0,0 +1,61 @@
++; Bind 9.x (CHROOT) -- Zone file -- for NetReg 1.5
++; Belongs at /etc/netreg/netreg.zone
++
++$TTL 3600
++. IN SOA localhost.  root.localhost. (
++	2005061501	; serial
++	10800		; refresh
++	3600		; retry
++	604800		; expire
++	86400		; default_ttl 
++)
++		IN      NS      localhost.
++
++; Allowed Windows Zones
++
++microsoft.com.	IN	NS	localhost.
++akadns.com.	IN	NS	localhost.
++akadns.net.	IN	NS	localhost.
++akamai.com.	IN	NS	localhost.
++akamai.net.	IN	NS	localhost.
++download.windowsupdate.com.	IN	NS	localhost.
++msft.com.	IN	NS	localhost.
++msft.net.	IN	NS	localhost.
++nsatc.net.	IN	NS	localhost.
++nsatc.com.	IN	NS	localhost.
++ntservicepack.microsoft.com.	IN	NS	localhost.
++windows.com.	IN	NS	localhost.
++windows.net.	IN	NS	localhost.
++windowsupdate.com.	IN	NS	localhost.
++windowsupdate.microsoft.com.	IN	NS	localhost.
++windowsupdate.net.	IN	NS	localhost.
++wustat.windows.com.	IN	NS	localhost.
++footprint.net.	IN	NS	localhost.
++edgesuite.net.	IN	NS	localhost.
++speedera.net.	IN	NS	localhost.
++speedera.com.	IN	NS	localhost.
++
++; Allowed Apple Zones
++
++apple.com.	IN 	NS	localhost.
++
++; Allowed antivirus zones
++
++sophos.com.	IN	NS	localhost.
++mcafee.com.	IN	NS	localhost.
++symantec.com.	IN	NS	localhost.
++
++; Allowed misc zones
++
++dell.com.	IN	NS	localhost.
++dell4me.com.	IN	NS	localhost.
++powerpcs.com.	IN	NS	localhost.
++
++; Wilcard Zones
++; 192.168.100.10 = your NetReg box IP
++; All TLD's used above must be wildcarded here
++
++netreg		IN	A	192.168.100.10
++*.com. 		IN	A	192.168.100.10
++*.net. 		IN	A	192.168.100.10
++*. 		IN	A	192.168.100.10
+diff -Naur netreg-1.5.1/var/named/chroot/etc/zones.conf netreg-bindconf/var/named/chroot/etc/zones.conf
+--- netreg-1.5.1/var/named/chroot/etc/zones.conf	1969-12-31 19:00:00.000000000 -0500
++++ netreg-bindconf/var/named/chroot/etc/zones.conf	2013-03-26 09:53:59.000000000 -0400
+@@ -0,0 +1,47 @@
++// BIND zones file for NetReg
++// 192.168.100.10 = your real DNS IP
++
++zone "microsoft.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "akadns.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "akadns.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "akamai.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "akamai.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "download.windowsupdate.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "msft.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "msft.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "nsatc.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "nsatc.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "ntservicepack.microsoft.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "windows.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "windows.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "windowsupdate.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "windowsupdate.microsoft.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "windowsupdate.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "wustat.windows.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "footprint.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "edgesuite.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "speedera.net" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "speedera.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++
++## Allowed Apple Zones
++
++zone "apple.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++
++## Allowed Antivirus Zones
++
++zone "sophos.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "mcafee.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "symantec.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++
++## Allowed Misc Zones
++
++zone "dell.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "dell4me.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++zone "powerpcs.com" { type forward; forwarders { 192.168.100.10; }; forward only; };
++
++## Wilcard zone
++
++zone "." {
++        type master;
++        file "/etc/netreg/netreg.zone";
++};
+diff -Naur netreg-1.5.1/var/named/chroot/var/named/named.ca netreg-bindconf/var/named/chroot/var/named/named.ca
+--- netreg-1.5.1/var/named/chroot/var/named/named.ca	2005-06-24 20:53:35.000000000 -0400
++++ netreg-bindconf/var/named/chroot/var/named/named.ca	1969-12-31 19:00:00.000000000 -0500
+@@ -1,61 +0,0 @@
+-; Bind 9.x (CHROOT) -- Zone file -- for NetReg 1.5
+-; Belongs at /var/named/chroot/var/named/named.ca
+-;
+-$TTL 3600
+-. IN SOA localhost.  root.localhost. (
+-	2005061501	; serial
+-	10800		; refresh
+-	3600		; retry
+-	604800	; expire
+-	86400		; default_ttl 
+-)
+-                  IN      NS      localhost.
+-
+-; Allowed Windows Zones
+-
+-microsoft.com.	IN	NS	localhost.
+-akadns.com.		IN	NS	localhost.
+-akadns.net.		IN	NS	localhost.
+-akamai.com.		IN	NS	localhost.
+-akamai.net.		IN	NS	localhost.
+-download.windowsupdate.com.	IN	NS	localhost.
+-msft.com.		IN	NS	localhost.
+-msft.net.		IN	NS	localhost.
+-nsatc.net.		IN	NS	localhost.
+-nsatc.com.		IN	NS	localhost.
+-ntservicepack.microsoft.com.	IN	NS	localhost.
+-windows.com.	IN	NS	localhost.
+-windows.net.	IN	NS	localhost.
+-windowsupdate.com.		IN	NS	localhost.
+-windowsupdate.microsoft.com.	IN	NS	localhost.
+-windowsupdate.net.		IN	NS	localhost.
+-wustat.windows.com.		IN	NS	localhost.
+-footprint.net.	IN	NS	localhost.
+-edgesuite.net.	IN	NS	localhost.
+-speedera.net.	IN	NS	localhost.
+-speedera.com.	IN	NS	localhost.
+-
+-; Allowed Apple Zones
+-
+-apple.com.		IN 	NS	localhost.
+-
+-; Allowed antivirus zones
+-
+-sophos.com.		IN	NS	localhost.
+-mcafee.com.		IN	NS	localhost.
+-symantec.com.	IN	NS	localhost.
+-
+-; Allowed misc zones
+-
+-dell.com.		IN	NS	localhost.
+-dell4me.com.	IN	NS	localhost.
+-powerpcs.com.	IN	NS	localhost.
+-
+-; Wilcard Zones
+-; 192.168.100.110 = your NetReg box IP
+-; All TLD's used above must be wildcarded here
+-
+-netreg		IN	A	192.168.100.110
+-*.com. 		IN	A	192.168.100.110
+-*.net. 		IN	A	192.168.100.110
+-*. 			IN	A	192.168.100.110
