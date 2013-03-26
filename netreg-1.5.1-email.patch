@@ -1,0 +1,35 @@
+diff -Naur netreg-1.5.1/var/www/cgi-bin/register.cgi netreg-email/var/www/cgi-bin/register.cgi
+--- netreg-1.5.1/var/www/cgi-bin/register.cgi	2005-07-08 01:26:13.000000000 -0400
++++ netreg-email/var/www/cgi-bin/register.cgi	2013-03-26 12:46:10.000000000 -0400
+@@ -98,6 +98,9 @@
+     ($name, $value) = split(/=/, $pair);
+     $value =~ tr/+/ /;
+     $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
++    if ($name eq "user") {
++        $FORM{'raw_user'} = $value;
++    }
+     $value =~ s/\s+//g;
+     if ($name eq "user") {
+       if ($AUTH_LC_USERNAME) {
+@@ -112,7 +115,7 @@
+     }
+     $FORM{$name} = $value;
+   }
+-  if ((!$FORM{'user'}) || (!$FORM{'pass'})) {
++  if ((!$FORM{'user'}) || ((!$FORM{'pass'}) && ($AUTH_METHOD ne "NULL"))) {
+     regerr("Invalid Login", \%UINFO);
+   }
+ }
+@@ -451,7 +454,11 @@
+   if ($DDNS_USE_HOST_DECL) {
+     $hostrec .= "ddns-hostname $FORM{'user'}-$SERIAL;";
+   }
+-  $hostrec .= "}\#$ENV{'HTTP_USER_AGENT'}\#$YR$MO$DAY $TIME\#$IP\n";
++  $hostrec .= "}\#$ENV{'HTTP_USER_AGENT'}\#$YR$MO$DAY $TIME\#$IP";
++  if ($FORM{'email'}) {
++      $hostrec .= "\#$FORM{'raw_user'} <$FORM{'email'}>";
++  }
++  $hostrec .= "\n";
+ 
+   if (!sysopen( DHCPDCONFNEW, "$DHCPDCONFPATH/$DHCPDCONFFILE.new", 
+     O_WRONLY | O_APPEND | O_CREAT )) {

@@ -1,7 +1,7 @@
 Summary: An automated DHCP Registration System
 Name: netreg
 Version: 1.5.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://netreg.org/
@@ -9,6 +9,7 @@ Source0: %{name}-%{version}.tar.gz
 Patch1: netreg-pathnames.patch
 Patch2: netreg-bindconf.patch
 Patch3: netreg-readme.patch
+Patch4: netreg-1.5.1-email.patch
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -26,6 +27,7 @@ they can gain full network access.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 
 %build
@@ -107,6 +109,9 @@ EOF
 
 
 %changelog
+* Tue Mar 26 2013 Phil Gold <phil@camaro.cs.jhu.edu> - 1.5.1-3
+- Add email field patch.
+
 * Tue Mar 26 2013 Phil Gold <phil@cs.jhu.edu> - 1.5.1-2
 - Fix apache redirect.
 - Create netreg.registered files.
